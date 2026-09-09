@@ -1,0 +1,22 @@
+{
+  "name": "wa-finance",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "libs/*"
+  ],
+  "scripts": {
+    "backend": "npm run dev --workspace=apps/backend",
+    "frontend": "npm run start --workspace=apps/frontend",
+    "dev": "concurrently \"npm run backend\" \"npm run frontend\"",
+    "test:backend": "npm run test --workspace=apps/backend",
+    "prisma:generate": "npm run prisma:generate --workspace=apps/backend",
+    "prisma:migrate": "npm run prisma:migrate --workspace=apps/backend",
+    "prisma:seed": "npm run prisma:seed --workspace=apps/backend",
+    "prisma:studio": "npm run prisma:studio --workspace=apps/backend"
+  },
+  "devDependencies": {
+    "@types/qrcode-terminal": "^0.12.2",
+    "concurrently": "^8.2.2"
+  }
+}
