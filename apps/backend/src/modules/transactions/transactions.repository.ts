@@ -11,6 +11,7 @@ export interface FindManyOptions {
   endDate?: Date;
   page: number;
   limit: number;
+  includeVoided?: boolean;
 }
 
 @Injectable()
@@ -24,6 +25,7 @@ export class TransactionsRepository {
   async findMany(opts: FindManyOptions) {
     const where: Prisma.TransactionWhereInput = {
       userId: opts.userId,
+      ...(opts.includeVoided ? {} : { status: 'ACTIVE' }),
       ...(opts.type && { type: opts.type }),
       ...(opts.categoryId && { categoryId: opts.categoryId }),
       ...(opts.paymentMethod && { paymentMethod: opts.paymentMethod }),
@@ -53,7 +55,7 @@ export class TransactionsRepository {
 
   async findById(id: string, userId: string) {
     return this.prisma.transaction.findFirst({
-      where: { id, userId },
+      where: { id, userId, status: 'ACTIVE' },
       include: { category: true },
     });
   }
@@ -69,7 +71,7 @@ export class TransactionsRepository {
   async getSummary(userId: string, startDate: Date, endDate: Date) {
     const result = await this.prisma.transaction.groupBy({
       by: ['type'],
-      where: { userId, date: { gte: startDate, lte: endDate } },
+      where: { userId, status: 'ACTIVE', date: { gte: startDate, lte: endDate } },
       _sum: { amount: true },
     });
 
@@ -82,7 +84,7 @@ export class TransactionsRepository {
   async getByPaymentMethod(userId: string, startDate: Date, endDate: Date) {
     return this.prisma.transaction.groupBy({
       by: ['paymentMethod', 'type'],
-      where: { userId, date: { gte: startDate, lte: endDate } },
+      where: { userId, status: 'ACTIVE', date: { gte: startDate, lte: endDate } },
       _sum: { amount: true },
     });
   }
@@ -90,9 +92,28 @@ export class TransactionsRepository {
   async getByCategory(userId: string, startDate: Date, endDate: Date) {
     return this.prisma.transaction.groupBy({
       by: ['categoryId', 'type'],
-      where: { userId, date: { gte: startDate, lte: endDate }, categoryId: { not: null } },
+      where: { userId, status: 'ACTIVE', date: { gte: startDate, lte: endDate }, categoryId: { not: null } },
       _sum: { amount: true },
       _count: true,
+    });
+  }
+
+  async findByMessageId(messageId: string) {
+    return this.prisma.transaction.findUnique({ where: { messageId } });
+  }
+
+  /** Void transaksi ACTIVE terakhir milik user (deterministik, ≤ window). */
+  async voidLast(userId: string, since: Date) {
+    const last = await this.prisma.transaction.findFirst({
+      where: { userId, status: 'ACTIVE', createdAt: { gte: since } },
+      orderBy: { createdAt: 'desc' },
+      include: { category: true },
+    });
+    if (!last) return null;
+    return this.prisma.transaction.update({
+      where: { id: last.id },
+      data: { status: 'VOIDED', voidedAt: new Date() },
+      include: { category: true },
     });
   }
 }

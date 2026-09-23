@@ -1,5 +1,5 @@
-import { IsEnum, IsOptional, IsInt, IsPositive, IsDateString, IsString, Min } from 'class-validator';
-import { Type } from 'class-transformer';
+import { IsEnum, IsOptional, IsInt, IsPositive, IsDateString, IsString, Min, IsBoolean } from 'class-validator';
+import { Type, Transform } from 'class-transformer';
 import { TransactionType, PaymentMethod } from '@prisma/client';
 
 export class FilterTransactionDto {
@@ -34,4 +34,9 @@ export class FilterTransactionDto {
   @IsInt()
   @Min(1)
   limit?: number = 20;
+
+  @IsOptional()
+  @Transform(({ value }) => value === true || value === 'true')
+  @IsBoolean()
+  includeVoided?: boolean = false;
 }

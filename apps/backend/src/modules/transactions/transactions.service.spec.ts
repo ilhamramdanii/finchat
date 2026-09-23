@@ -8,7 +8,7 @@ describe('TransactionsService', () => {
   let repo: jest.Mocked<
     Pick<
       TransactionsRepository,
-      'create' | 'findMany' | 'findById' | 'update' | 'delete' | 'getSummary'
+      'create' | 'findMany' | 'findById' | 'update' | 'delete' | 'getSummary' | 'findByMessageId' | 'voidLast'
     >
   >;
 
@@ -20,6 +20,8 @@ describe('TransactionsService', () => {
       update: jest.fn(),
       delete: jest.fn(),
       getSummary: jest.fn(),
+      findByMessageId: jest.fn(),
+      voidLast: jest.fn(),
     } as any;
 
     const module: TestingModule = await Test.createTestingModule({
@@ -74,12 +76,33 @@ describe('TransactionsService', () => {
 
     it('does not set category when categoryId absent', async () => {
       repo.create.mockResolvedValue({ id: 't1' } as any);
+      repo.findByMessageId.mockResolvedValue(null);
       await service.create('u1', {
         type: 'INCOME',
         description: 'gajian',
         amount: 5_000_000,
       } as any);
       expect(repo.create.mock.calls[0][0].category).toBeUndefined();
+    });
+
+    it('returns existing transaction on duplicate messageId (idempotent)', async () => {
+      const existing = { id: 't-dup' };
+      repo.findByMessageId.mockResolvedValue(existing as any);
+      const result = await service.create('u1', {
+        type: 'EXPENSE',
+        description: 'makan',
+        amount: 20_000,
+        messageId: 'WA123',
+      } as any);
+      expect(result).toBe(existing as any);
+      expect(repo.create).not.toHaveBeenCalled();
+    });
+
+    it('voidLast delegates to repo with 60-min window', async () => {
+      repo.voidLast.mockResolvedValue({ id: 't1' } as any);
+      const result = await service.voidLast('u1');
+      expect(repo.voidLast).toHaveBeenCalledTimes(1);
+      expect(result).toEqual({ id: 't1' });
     });
   });
 

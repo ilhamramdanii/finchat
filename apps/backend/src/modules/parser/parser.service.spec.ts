@@ -144,6 +144,27 @@ describe('ParserService', () => {
     });
   });
 
+  // ── Commands ────────────────────────────────────────────────────────────────
+
+  describe('parse — commands', () => {
+    it.each([
+      ['/batal', 'CANCEL'],
+      ['batal', 'CANCEL'],
+      ['/hapus', 'CANCEL'],
+      ['hapus', 'CANCEL'],
+      ['/undo', 'CANCEL'],
+      ['undo', 'CANCEL'],
+      ['/total', 'TOTAL'],
+      ['/laporan', 'REPORT'],
+      ['/saldo', 'BALANCE'],
+      ['/bantuan', 'HELP'],
+    ])('"%s" → command=%s', (input, expected) => {
+      const result = service.parse(input);
+      expect(result.kind).toBe('COMMAND');
+      expect(result.command).toBe(expected);
+    });
+  });
+
   // ── Edge cases ────────────────────────────────────────────────────────────
 
   describe('parse — edge cases', () => {

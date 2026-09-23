@@ -34,6 +34,12 @@ export class ApiService {
       .pipe(map((r: ApiResponse<T>) => r.data));
   }
 
+  put<T>(path: string, body: unknown): Observable<T> {
+    return this.http
+      .put<ApiResponse<T>>(`${this.baseUrl}/${path}`, body)
+      .pipe(map((r: ApiResponse<T>) => r.data));
+  }
+
   patch<T>(path: string, body: unknown): Observable<T> {
     return this.http
       .patch<ApiResponse<T>>(`${this.baseUrl}/${path}`, body)

@@ -7,6 +7,7 @@ import { PaymentMethod, TransactionSource } from '@prisma/client';
 interface CreateRawOptions extends CreateTransactionDto {
   rawMessage?: string;
   source?: TransactionSource;
+  messageId?: string;
 }
 
 @Injectable()
@@ -14,6 +15,10 @@ export class TransactionsService {
   constructor(private readonly repo: TransactionsRepository) {}
 
   async create(userId: string, dto: CreateRawOptions) {
+    if (dto.messageId) {
+      const existing = await this.repo.findByMessageId(dto.messageId);
+      if (existing) return existing; // idempotent replay
+    }
     return this.repo.create({
       user: { connect: { id: userId } },
       type: dto.type,
@@ -23,6 +28,7 @@ export class TransactionsService {
       source: dto.source ?? 'MANUAL',
       rawMessage: dto.rawMessage ?? dto.description,
       date: dto.date ? new Date(dto.date) : new Date(),
+      ...(dto.messageId && { messageId: dto.messageId }),
       ...(dto.categoryId && { category: { connect: { id: dto.categoryId } } }),
     });
   }
@@ -37,6 +43,7 @@ export class TransactionsService {
       endDate: filter.endDate ? new Date(filter.endDate) : undefined,
       page: filter.page ?? 1,
       limit: filter.limit ?? 20,
+      includeVoided: filter.includeVoided ?? false,
     });
   }
 
@@ -85,5 +92,11 @@ export class TransactionsService {
 
   async getSummary(userId: string, start: Date, end: Date) {
     return this.repo.getSummary(userId, start, end);
+  }
+
+  /** Batalkan transaksi terakhir dalam window (default 60 menit). */
+  async voidLast(userId: string, windowMinutes = 60) {
+    const since = new Date(Date.now() - windowMinutes * 60_000);
+    return this.repo.voidLast(userId, since);
   }
 }

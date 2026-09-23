@@ -25,5 +25,6 @@ export const WA_HELP_MESSAGE = `
 > \`/total\` — total hari ini
 > \`/saldo\` — saldo bulan ini
 > \`/laporan\` — laporan bulan ini
+> \`/batal\` — batalkan transaksi terakhir (≤ 60 menit)
 > \`/bantuan\` — tampilkan pesan ini
 `.trim();

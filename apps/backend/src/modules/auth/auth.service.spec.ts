@@ -2,11 +2,13 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { JwtService } from '@nestjs/jwt';
 import { AuthService } from './auth.service';
 import { PrismaService } from '../../prisma/prisma.service';
+import { OtpService } from './otp.service';
 
 describe('AuthService', () => {
   let service: AuthService;
   let prisma: { user: { upsert: jest.Mock; findUnique: jest.Mock } };
   let jwt: { sign: jest.Mock };
+  let otp: { request: jest.Mock; verify: jest.Mock };
 
   beforeEach(async () => {
     prisma = {
@@ -16,12 +18,14 @@ describe('AuthService', () => {
       },
     };
     jwt = { sign: jest.fn() };
+    otp = { request: jest.fn(), verify: jest.fn() };
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         AuthService,
         { provide: PrismaService, useValue: prisma },
         { provide: JwtService, useValue: jwt },
+        { provide: OtpService, useValue: otp },
       ],
     }).compile();
 
@@ -75,6 +79,25 @@ describe('AuthService', () => {
     it('returns null when user not found', async () => {
       prisma.user.findUnique.mockResolvedValue(null);
       expect(await service.getProfile('nope')).toBeNull();
+    });
+  });
+
+  describe('verifyOtp', () => {
+    it('issues token on valid OTP (single-use)', async () => {
+      const user = { id: 'u1', phone: '628123', name: 'Ilham' };
+      otp.verify.mockReturnValue(true);
+      prisma.user.upsert.mockResolvedValue(user);
+      jwt.sign.mockReturnValue('otp.jwt.token');
+
+      const result = await service.verifyOtp('628123', '123456', 'Ilham');
+      expect(otp.verify).toHaveBeenCalledWith('628123', '123456');
+      expect(result).toEqual({ token: 'otp.jwt.token', user });
+    });
+
+    it('rejects invalid OTP', async () => {
+      otp.verify.mockReturnValue(false);
+      await expect(service.verifyOtp('628123', '000000')).rejects.toThrow();
+      expect(prisma.user.upsert).not.toHaveBeenCalled();
     });
   });
 });

@@ -27,6 +27,15 @@ export class AuthStore {
     this._user.set(user);
   }
 
+  updateUserName(name: string) {
+    const current = this._user();
+    if (current) {
+      const updated = { ...current, name };
+      localStorage.setItem(USER_KEY, JSON.stringify(updated));
+      this._user.set(updated);
+    }
+  }
+
   logout() {
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(USER_KEY);

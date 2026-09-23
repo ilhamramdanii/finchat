@@ -1,6 +1,7 @@
-import { Controller, Get, Post, Delete, Body, Param, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Param, Query, UseGuards } from '@nestjs/common';
 import { CategoriesService } from './categories.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
+import { UpdateCategoryDto, BulkUpdateKeywordsDto } from './dto/update-category.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CategoryType } from '@prisma/client';
 
@@ -17,6 +18,16 @@ export class CategoriesController {
   @Post()
   create(@Body() dto: CreateCategoryDto) {
     return this.service.create(dto);
+  }
+
+  @Put('bulk-keywords')
+  bulkUpdateKeywords(@Body() dto: BulkUpdateKeywordsDto) {
+    return this.service.bulkUpdateKeywords(dto);
+  }
+
+  @Put(':id')
+  update(@Param('id') id: string, @Body() dto: UpdateCategoryDto) {
+    return this.service.update(id, dto);
   }
 
   @Delete(':id')

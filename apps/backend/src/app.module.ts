@@ -11,6 +11,7 @@ import { WhatsappModule } from './modules/whatsapp/whatsapp.module';
 import { TransactionsModule } from './modules/transactions/transactions.module';
 import { CategoriesModule } from './modules/categories/categories.module';
 import { ReportsModule } from './modules/reports/reports.module';
+import { VoiceModule } from './modules/voice/voice.module';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { ReportsModule } from './modules/reports/reports.module';
     TransactionsModule,
     CategoriesModule,
     ReportsModule,
+    VoiceModule,
   ],
 })
 export class AppModule {}

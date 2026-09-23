@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { normalizeIdNumberWords } from './id-number-words';
 
 export type ParsedTransactionType = 'EXPENSE' | 'INCOME';
 export type ParsedPaymentMethod = 'CASH' | 'TRANSFER' | 'QRIS';
@@ -11,7 +12,7 @@ export interface ParsedTransaction {
   rawMessage: string;
 }
 
-export type CommandType = 'TOTAL' | 'REPORT' | 'HELP' | 'BALANCE';
+export type CommandType = 'TOTAL' | 'REPORT' | 'HELP' | 'BALANCE' | 'CANCEL';
 
 export interface ParseResult {
   kind: 'TRANSACTION' | 'COMMAND' | 'UNKNOWN';
@@ -44,12 +45,21 @@ const COMMAND_MAP: Record<string, CommandType> = {
   '/laporan': 'REPORT', 'laporan': 'REPORT', '/report': 'REPORT', 'report': 'REPORT',
   '/bantuan': 'HELP', 'bantuan': 'HELP', '/help': 'HELP', 'help': 'HELP',
   '/saldo': 'BALANCE', 'saldo': 'BALANCE', '/balance': 'BALANCE', 'balance': 'BALANCE',
+  '/batal': 'CANCEL', 'batal': 'CANCEL', '/hapus': 'CANCEL', 'hapus': 'CANCEL',
+  '/undo': 'CANCEL', 'undo': 'CANCEL',
 };
+
+// Kata penghubung khas ucapan yang dibuang dari deskripsi pada fallback
+// amount-di-tengah (tidak menyentuh dua pola utama di atas).
+const VOICE_FILLERS = new Set(['pakai', 'pake', 'sebesar', 'senilai', 'seharga']);
 
 @Injectable()
 export class ParserService {
   parse(raw: string): ParseResult {
-    const trimmed = raw.trim();
+    // Normalisasi angka-terbilang dulu agar input suara
+    // ("makan dua puluh ribu") menjadi format digit ("makan 20rb").
+    // Idempotent untuk input digit/WA yang sudah ada.
+    const trimmed = normalizeIdNumberWords(raw.trim());
 
     // ── Command check ───────────────────────────────────────────────────────
     const command = COMMAND_MAP[trimmed.toLowerCase()];
@@ -101,6 +111,21 @@ export class ParserService {
     } else if (amountLast) {
       amount = this.parseAmount(amountLast[2]);
       description = amountLast[1].trim();
+    } else {
+      // Fallback untuk input suara: STT sering menyisipkan kata penghubung
+      // ("makan 20rb pakai qris" — amount di tengah). Cari token amount di
+      // posisi mana pun. Hanya tercapai bila dua pola di atas gagal, jadi
+      // perilaku existing untuk input WA tidak berubah.
+      const parts = workingStr.split(/\s+/);
+      const idx = parts.findIndex((p) => /^[+-]?\d[\d.,]*(?:rb|k|jt|m)?$/i.test(p));
+      if (idx >= 0) {
+        amount = this.parseAmount(parts[idx]);
+        parts.splice(idx, 1);
+        description = parts
+          .filter((p) => !VOICE_FILLERS.has(p.toLowerCase()))
+          .join(' ')
+          .trim();
+      }
     }
 
     if (!amount || !description) return null;

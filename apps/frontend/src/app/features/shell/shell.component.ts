@@ -1,7 +1,7 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
-import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { AuthStore } from '../../store/auth.store';
-import { NotificationStore } from '../../store/notification.store';
+import { I18nService } from '../../core/services/i18n.service';
 
 @Component({
   selector: 'app-shell',
@@ -10,478 +10,437 @@ import { NotificationStore } from '../../store/notification.store';
   template: `
     <div class="shell">
 
-      <!-- ── Sidebar ── -->
-      <aside class="sidebar" [class.collapsed]="collapsed()">
+      <!-- ── Mobile Overlay Backdrop ── -->
+      @if (mobileOpen()) {
+        <div class="mobile-backdrop" (click)="closeMobileMenu()"></div>
+      }
 
-        <!-- Brand -->
-        <div class="sidebar-brand">
-          <div class="brand-mark">
-            <span class="brand-mono">WA</span>
-          </div>
-          @if (!collapsed()) {
-            <div class="brand-text">
-              <span class="brand-name">WA Finance</span>
-              <span class="brand-tag">Personal Tracker</span>
-            </div>
-          }
-        </div>
-
-        <!-- Nav -->
-        <nav class="sidebar-nav">
-
-          <!-- Dashboard -->
-          <a class="nav-item" routerLink="/dashboard" routerLinkActive="active"
-            (mouseenter)="showTip($event, 'Dashboard')" (mouseleave)="hideTip()">
-            <span class="nav-icon"><i class="bi bi-house-fill"></i></span>
-            @if (!collapsed()) { <span class="nav-label">Dashboard</span> }
-          </a>
-
-          <!-- Transaksi -->
-          <a class="nav-item" routerLink="/transactions" routerLinkActive="active"
-            (mouseenter)="showTip($event, 'Transaksi')" (mouseleave)="hideTip()">
-            <span class="nav-icon"><i class="bi bi-arrow-left-right"></i></span>
-            @if (!collapsed()) { <span class="nav-label">Transaksi</span> }
-          </a>
-
-          <!-- Laporan + sub-menu -->
-          <div class="nav-group">
-            <a class="nav-item" routerLink="/reports" routerLinkActive="active"
-              [routerLinkActiveOptions]="{exact: false}"
-              (mouseenter)="showTip($event, 'Laporan')" (mouseleave)="hideTip()">
-              <span class="nav-icon"><i class="bi bi-bar-chart-fill"></i></span>
-              @if (!collapsed()) {
-                <span class="nav-label">Laporan</span>
-                @if (isOnReports()) {
-                  <i class="bi bi-chevron-down nav-chevron"></i>
-                } @else {
-                  <i class="bi bi-chevron-right nav-chevron"></i>
-                }
-              }
-            </a>
-
-            <!-- Sub-menu: always visible when on /reports -->
-            @if (isOnReports()) {
-              <div class="sub-nav">
-                <a class="sub-item" routerLink="/reports" [queryParams]="{tab:'overview'}"
-                  [class.active]="currentTab()==='overview'"
-                  (mouseenter)="showTip($event, 'Ringkasan')" (mouseleave)="hideTip()">
-                  <span class="sub-icon"><i class="bi bi-grid-1x2"></i></span>
-                  @if (!collapsed()) { Ringkasan }
-                </a>
-                <a class="sub-item" routerLink="/reports" [queryParams]="{tab:'daily'}"
-                  [class.active]="currentTab()==='daily'"
-                  (mouseenter)="showTip($event, 'Harian')" (mouseleave)="hideTip()">
-                  <span class="sub-icon"><i class="bi bi-bar-chart"></i></span>
-                  @if (!collapsed()) { Harian }
-                </a>
-                <a class="sub-item" routerLink="/reports" [queryParams]="{tab:'calendar'}"
-                  [class.active]="currentTab()==='calendar'"
-                  (mouseenter)="showTip($event, 'Kalender')" (mouseleave)="hideTip()">
-                  <span class="sub-icon"><i class="bi bi-calendar3"></i></span>
-                  @if (!collapsed()) { Kalender }
-                </a>
-                <a class="sub-item" routerLink="/reports" [queryParams]="{tab:'insights'}"
-                  [class.active]="currentTab()==='insights'"
-                  (mouseenter)="showTip($event, 'Insights')" (mouseleave)="hideTip()">
-                  <span class="sub-icon"><i class="bi bi-lightbulb"></i></span>
-                  @if (!collapsed()) { Insights }
-                </a>
+      <!-- ── macOS Inspired Vibrant Sidebar ── -->
+      <aside class="sidebar" [class.collapsed]="collapsed()" [class.mobile-open]="mobileOpen()">
+        <div class="sidebar-header">
+          <div class="brand-block">
+            <span class="brand-symbol">
+              <i class="bi bi-wallet-fill"></i>
+            </span>
+            @if (!collapsed()) {
+              <div class="brand-meta">
+                <span class="brand-title">FinChat</span>
+                <span class="brand-sub num">{{ i18n.t().brandSub }}</span>
               </div>
             }
           </div>
+          <button class="mobile-close-btn" (click)="closeMobileMenu()" [title]="i18n.t().cancel">
+            <i class="bi bi-x-circle-fill"></i>
+          </button>
+        </div>
 
+        <nav class="sidebar-nav">
+          <a class="nav-item" routerLink="/dashboard" routerLinkActive="active" (click)="closeMobileMenu()">
+            <span class="nav-icon"><i class="bi bi-square-grid-2x2-fill"></i></span>
+            <span class="nav-label">{{ i18n.t().navOverview }}</span>
+          </a>
+
+          <a class="nav-item" routerLink="/transactions" routerLinkActive="active" (click)="closeMobileMenu()">
+            <span class="nav-icon"><i class="bi bi-tray-fill"></i></span>
+            <span class="nav-label">{{ i18n.t().navLedger }}</span>
+          </a>
+
+          <a class="nav-item" routerLink="/reports" routerLinkActive="active" (click)="closeMobileMenu()">
+            <span class="nav-icon"><i class="bi bi-chart-pie-fill"></i></span>
+            <span class="nav-label">{{ i18n.t().navReports }}</span>
+          </a>
+
+          <a class="nav-item" routerLink="/profile" routerLinkActive="active" (click)="closeMobileMenu()">
+            <span class="nav-icon"><i class="bi bi-person-crop-circle-fill"></i></span>
+            <span class="nav-label">{{ i18n.t().navAccount }}</span>
+          </a>
         </nav>
 
-        <!-- Footer -->
-        <div class="sidebar-footer" [class.footer-col]="collapsed()">
-          <div class="user-row" [class.row-center]="collapsed()">
+        <div class="sidebar-footer">
+          <div class="user-block">
             <div class="user-avatar">
               {{ auth.user()?.name ? auth.user()!.name![0].toUpperCase() : 'U' }}
             </div>
-            @if (!collapsed()) {
-              <div class="user-meta">
-                <span class="user-name">{{ auth.user()?.name ?? 'Pengguna' }}</span>
-                <span class="user-phone">{{ auth.user()?.phone }}</span>
-              </div>
-            }
+            <div class="user-info">
+              <span class="user-name">{{ auth.user()?.name ?? 'User' }}</span>
+              <span class="user-phone num">{{ auth.user()?.phone }}</span>
+            </div>
           </div>
-          <button class="logout-btn" (click)="logout()" title="Keluar">
-            <i class="bi bi-box-arrow-right"></i>
+          <button class="logout-btn tap-target-44" (click)="logout()" [title]="i18n.t().logoutConfirm">
+            <i class="bi bi-rectangle-portrait-and-arrow-right"></i>
           </button>
         </div>
       </aside>
 
-      <!-- ── Content ── -->
+      <!-- ── Main Content Area ── -->
       <div class="content-wrap">
-        <div class="g-topbar">
-          <button class="toggle-btn" (click)="toggleSidebar()">
-            <i class="bi bi-list"></i>
+        <!-- Apple macOS / iOS Topbar Bar -->
+        <header class="topbar liquid-glass">
+          <button class="toggle-btn tap-target-44" (click)="toggleSidebar()" title="Toggle Sidebar">
+            <i class="bi bi-sidebar-reverse"></i>
           </button>
-          <div class="g-spacer"></div>
 
-          <!-- Notification -->
+          <div class="topbar-title font-display">
+            <span class="topbar-chip">FinChat</span>
+          </div>
+
+          <div class="topbar-spacer"></div>
+
+          <!-- Language Segmented Switch in Topbar -->
+          <div class="lang-pill" (click)="toggleLang()" [title]="'Switch language to ' + (i18n.currentLang() === 'id' ? 'English' : 'Bahasa Indonesia')">
+            <span class="lang-flag">{{ i18n.currentLang() === 'id' ? '🇮🇩' : '🇬🇧' }}</span>
+            <span class="lang-code">{{ i18n.currentLang().toUpperCase() }}</span>
+          </div>
+
+          <!-- Apple Notification Bell Icon -->
           <div class="notif-wrap">
-            <button class="notif-btn" (click)="toggleNotif()" title="Notifikasi">
+            <button class="notif-btn tap-target-44" (click)="toggleNotifPopover()" [title]="i18n.t().notifications">
               <i class="bi bi-bell-fill"></i>
-              @if (notifStore.unreadCount() > 0) {
-                <span class="notif-dot">
-                  @if (notifStore.unreadCount() < 10) { {{ notifStore.unreadCount() }} }
-                </span>
-              }
+              <span class="notif-dot"></span>
             </button>
-            @if (notifOpen()) {
-              <div class="notif-backdrop" (click)="notifOpen.set(false)"></div>
-              <div class="notif-panel">
-                <div class="notif-hdr">
-                  <span class="notif-hdr-title">Notifikasi</span>
-                  <div class="notif-hdr-actions">
-                    @if (notifStore.notifications().length > 0) {
-                      <span class="notif-clear" (click)="notifStore.clear()">Hapus semua</span>
-                    }
+
+            @if (showNotifs()) {
+              <div class="notif-backdrop" (click)="showNotifs.set(false)"></div>
+              <div class="notif-popover apple-card">
+                <div class="notif-pop-hdr">
+                  <span class="notif-pop-title font-display">{{ i18n.t().notificationsTitle }}</span>
+                  <span class="badge income">Active</span>
+                </div>
+                <div class="notif-pop-list">
+                  <div class="notif-item">
+                    <div class="notif-ico-box"><i class="bi bi-shield-check"></i></div>
+                    <div class="notif-item-content">
+                      <span class="notif-item-title">{{ i18n.currentLang() === 'id' ? 'Sistem Terhubung' : 'System Connected' }}</span>
+                      <span class="notif-item-desc">{{ i18n.currentLang() === 'id' ? 'WhatsApp FinChat Bot aktif sinkronisasi.' : 'WhatsApp FinChat Bot active sync.' }}</span>
+                    </div>
+                  </div>
+                  <div class="notif-item">
+                    <div class="notif-ico-box cobalt-ico"><i class="bi bi-check2-circle"></i></div>
+                    <div class="notif-item-content">
+                      <span class="notif-item-title">{{ i18n.currentLang() === 'id' ? 'Audit Kas Siap' : 'Ledger Audit Ready' }}</span>
+                      <span class="notif-item-desc">{{ i18n.currentLang() === 'id' ? 'Laporan periode bulanan telah dikalkulasi.' : 'Monthly summary calculated.' }}</span>
+                    </div>
                   </div>
                 </div>
-                @if (notifStore.notifications().length === 0) {
-                  <div class="notif-empty">
-                    <i class="bi bi-bell-slash"></i>
-                    <p>Belum ada notifikasi</p>
-                  </div>
-                } @else {
-                  <div class="notif-list">
-                    @for (n of notifStore.notifications(); track n.id) {
-                      <div class="notif-item" [class.unread]="!n.read" [class.notif-success]="n.type==='success'" [class.notif-error]="n.type==='error'" [class.notif-info]="n.type==='info'">
-                        <span class="notif-icon">
-                          @if (n.type === 'success') { <i class="bi bi-check-circle-fill"></i> }
-                          @else if (n.type === 'error') { <i class="bi bi-x-circle-fill"></i> }
-                          @else { <i class="bi bi-info-circle-fill"></i> }
-                        </span>
-                        <div class="notif-body">
-                          <span class="notif-msg">{{ n.message }}</span>
-                          <span class="notif-time">{{ relativeTime(n.time) }}</span>
-                        </div>
-                      </div>
-                    }
-                  </div>
-                }
               </div>
             }
           </div>
 
-          <button class="theme-btn" (click)="toggleDark()">
-            @if (dark()) { <i class="bi bi-sun-fill"></i> }
-            @else         { <i class="bi bi-moon-stars-fill"></i> }
+          <button class="logout-top-btn tap-target-44" (click)="logout()" [title]="i18n.t().logout">
+            <i class="bi bi-box-arrow-right"></i>
           </button>
-        </div>
+        </header>
+
+        <!-- Main Viewport -->
         <main class="shell-main">
           <router-outlet />
         </main>
-      </div>
 
-      <!-- ── Nav tooltip (fixed, outside sidebar overflow) ── -->
-      @if (tip(); as t) {
-        <div class="nav-tip" [style.top.px]="t.top" [style.left.px]="t.left">
-          {{ t.label }}
-        </div>
-      }
+        <!-- ── Apple Liquid Glass Mobile Tab Bar ── -->
+        <nav class="mobile-bottom-bar liquid-glass">
+          <a routerLink="/dashboard" routerLinkActive="active" class="mbar-item tap-target-44">
+            <div class="mbar-icon-wrap">
+              <i class="bi bi-square-grid-2x2-fill"></i>
+            </div>
+            <span>{{ i18n.t().navOverview }}</span>
+          </a>
+          <a routerLink="/transactions" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" class="mbar-item tap-target-44">
+            <div class="mbar-icon-wrap">
+              <i class="bi bi-tray-fill"></i>
+            </div>
+            <span>{{ i18n.t().navLedger }}</span>
+          </a>
+          <a routerLink="/transactions" [queryParams]="{action:'new'}" class="mbar-item mbar-center tap-target-44" [title]="i18n.t().newTransaction">
+            <div class="mbar-action-pill">
+              <i class="bi bi-plus-lg"></i>
+            </div>
+          </a>
+          <a routerLink="/reports" routerLinkActive="active" class="mbar-item tap-target-44">
+            <div class="mbar-icon-wrap">
+              <i class="bi bi-chart-pie-fill"></i>
+            </div>
+            <span>{{ i18n.t().navReports }}</span>
+          </a>
+          <a routerLink="/profile" routerLinkActive="active" class="mbar-item tap-target-44">
+            <div class="mbar-icon-wrap">
+              <i class="bi bi-person-crop-circle-fill"></i>
+            </div>
+            <span>{{ i18n.t().navAccount }}</span>
+          </a>
+        </nav>
+      </div>
 
     </div>
   `,
   styles: [`
-    .shell { display:flex; height:100vh; overflow:hidden; }
+    .shell { display: flex; height: 100vh; width: 100vw; overflow: hidden; position: relative; background: var(--bg); }
 
-    /* ── Sidebar ── */
+    /* ── Apple macOS Sidebar ── */
     .sidebar {
-      width:230px; flex-shrink:0;
-      background:var(--surface);
-      border-right:1px solid var(--border);
-      display:flex; flex-direction:column;
-      overflow:hidden;
-      transition:width 0.24s cubic-bezier(0.4,0,0.2,1);
-      position:relative; z-index:20;
+      width: 230px; flex-shrink: 0; background: var(--surface-translucent);
+      backdrop-filter: blur(25px) saturate(190%);
+      -webkit-backdrop-filter: blur(25px) saturate(190%);
+      border-right: 1px solid var(--border); display: flex; flex-direction: column;
+      transition: width 0.22s cubic-bezier(0.16, 1, 0.3, 1), transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative; z-index: 100;
     }
-    .sidebar.collapsed { width:58px; }
+    .sidebar.collapsed { width: 68px; }
+    .sidebar.collapsed .brand-meta,
+    .sidebar.collapsed .nav-label,
+    .sidebar.collapsed .user-info { display: none !important; }
 
-    /* Brand */
-    .sidebar-brand {
-      display:flex; align-items:center; gap:11px;
-      padding:20px 16px 18px;
-      min-height:68px; overflow:hidden;
-      border-bottom:1px solid var(--border);
+    .sidebar-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 16px; height: 60px; border-bottom: 1px solid var(--border);
     }
-    .brand-mark {
-      width:36px; height:36px; flex-shrink:0;
-      background:linear-gradient(135deg, #2DD4BF 0%, #0D9488 100%);
-      border-radius:10px;
-      display:flex; align-items:center; justify-content:center;
-      box-shadow:0 4px 12px rgba(45,212,191,0.28);
+    .brand-block { display: flex; align-items: center; gap: 10px; }
+    .brand-symbol {
+      width: 32px; height: 32px; border-radius: 9px; background: var(--cobalt);
+      color: #FFF; font-size: 1rem;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+      box-shadow: 0 2px 8px rgba(0, 122, 255, 0.35);
     }
-    .brand-mono { font-size:0.72rem; font-weight:900; color:#0D0F12; letter-spacing:-0.04em; font-family:var(--font-mono); }
-    .brand-text { display:flex; flex-direction:column; line-height:1; white-space:nowrap; }
-    .brand-name { font-size:0.9rem; font-weight:800; color:var(--text); letter-spacing:-0.02em; }
-    .brand-tag  { font-size:0.58rem; color:var(--subtle); margin-top:3px; font-weight:500; letter-spacing:0.04em; text-transform:uppercase; }
+    .brand-meta { display: flex; flex-direction: column; line-height: 1.1; }
+    .brand-title { font-size: 1rem; font-weight: 700; color: var(--text); letter-spacing: -0.02em; }
+    .brand-sub { font-size: 0.58rem; color: var(--subtle); font-weight: 600; letter-spacing: 0.04em; margin-top: 2px; }
 
-    /* Nav */
-    .sidebar-nav {
-      flex:1; padding:12px 10px 8px;
-      display:flex; flex-direction:column; gap:2px;
-      overflow-y:auto; overflow-x:hidden;
-    }
+    .mobile-close-btn { display: none; background: none; border: none; font-size: 1.2rem; color: var(--muted); cursor: pointer; }
 
-    .nav-group { display:flex; flex-direction:column; }
-
+    .sidebar-nav { flex: 1; padding: 12px 8px; display: flex; flex-direction: column; gap: 4px; }
     .nav-item {
-      display:flex; align-items:center; gap:10px;
-      padding:10px 12px; border-radius:10px;
-      color:var(--muted); font-size:0.84rem; font-weight:500;
-      transition:background 0.14s, color 0.14s, box-shadow 0.14s;
-      cursor:pointer; white-space:nowrap; overflow:hidden;
-      text-decoration:none; position:relative;
-      &:hover { background:var(--bg); color:var(--text); }
+      display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px;
+      color: var(--muted); font-size: 0.88rem; font-weight: 500; text-decoration: none;
+      transition: all 0.15s ease;
+      &:hover { background: var(--surface-2); color: var(--text); }
       &.active {
-        background:transparent; color:var(--emerald); font-weight:700;
-        box-shadow:inset 2px 0 0 var(--emerald);
+        background: var(--cobalt); color: #FFFFFF; font-weight: 600;
+        box-shadow: 0 2px 8px rgba(0, 122, 255, 0.28);
       }
     }
-    .collapsed .nav-item {
-      justify-content:center; padding:10px;
-      &.active { box-shadow:none; background:var(--emerald-dim); }
-    }
-    .nav-icon    { width:18px; text-align:center; font-size:0.95rem; flex-shrink:0; }
-    .nav-label   { flex:1; }
-    .nav-chevron { font-size:0.6rem; color:var(--subtle); flex-shrink:0; }
+    .nav-icon { font-size: 1.05rem; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
 
-    /* Sub-menu */
-    .sub-nav {
-      display:flex; flex-direction:column; gap:1px;
-      padding:2px 0 4px; overflow:hidden;
-      animation:subIn 0.18s ease both;
-    }
-    @keyframes subIn { from { opacity:0; transform:translateY(-4px); } to { opacity:1; transform:translateY(0); } }
-
-    .sub-item {
-      display:flex; align-items:center; gap:9px;
-      padding:7px 12px 7px 34px;
-      border-radius:8px;
-      color:var(--muted); font-size:0.8rem; font-weight:500;
-      transition:all 0.14s; cursor:pointer; text-decoration:none;
-      white-space:nowrap; overflow:hidden;
-      &:hover { background:var(--bg); color:var(--text); }
-      &.active { color:var(--emerald); font-weight:700; background:var(--emerald-dim); }
-    }
-    .sub-icon { width:14px; text-align:center; font-size:0.8rem; flex-shrink:0; }
-    .collapsed .sub-item {
-      justify-content:center; padding:7px 10px;
-    }
-
-    /* Footer */
     .sidebar-footer {
-      padding:12px 10px; border-top:1px solid var(--border);
-      display:flex; align-items:center; gap:6px; overflow:hidden;
+      padding: 12px 14px; border-top: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between; gap: 8px;
+      background: var(--surface-2);
     }
-    .footer-col { flex-direction:column; padding:8px 6px; gap:6px; }
-    .user-row   { display:flex; align-items:center; gap:8px; flex:1; min-width:0; }
-    .row-center { justify-content:center; }
+    .user-block { display: flex; align-items: center; gap: 10px; min-width: 0; }
     .user-avatar {
-      width:32px; height:32px; flex-shrink:0;
-      background:linear-gradient(135deg, #10B981, #059669);
-      border-radius:9px;
-      display:flex; align-items:center; justify-content:center;
-      font-size:0.72rem; font-weight:800; color:white;
+      width: 32px; height: 32px; border-radius: 50%; background: var(--cobalt-dim); color: var(--cobalt);
+      font-weight: 700; font-size: 0.82rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
     }
-    .user-meta  { display:flex; flex-direction:column; min-width:0; overflow:hidden; }
-    .user-name  { font-size:0.76rem; font-weight:700; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-    .user-phone { font-size:0.6rem; color:var(--subtle); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-    .logout-btn {
-      width:30px; height:30px; flex-shrink:0; border-radius:8px;
-      background:none; border:none; color:var(--subtle); font-size:0.85rem;
-      display:flex; align-items:center; justify-content:center;
-      cursor:pointer; transition:all 0.14s;
-      &:hover { background:var(--red-dim); color:var(--red); }
-    }
-    .footer-col .logout-btn { width:100%; border-radius:7px; }
+    .user-info { display: flex; flex-direction: column; min-width: 0; }
+    .user-name { font-size: 0.82rem; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .user-phone { font-size: 0.68rem; color: var(--subtle); }
 
-    /* ── Content ── */
-    .content-wrap { flex:1; display:flex; flex-direction:column; overflow:hidden; min-width:0; }
-    .g-topbar {
-      height:48px; flex-shrink:0;
-      background:var(--surface); border-bottom:1px solid var(--border);
-      display:flex; align-items:center; padding:0 20px; gap:8px;
+    .logout-btn {
+      background: none; border: none; color: var(--subtle); cursor: pointer; font-size: 1.05rem;
+      border-radius: 8px; display: flex; align-items: center; justify-content: center;
+      transition: all 0.14s ease;
+      &:hover { color: var(--red); background: var(--red-dim); }
+    }
+
+    /* ── Content Wrap ── */
+    .content-wrap { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-width: 0; position: relative; }
+    .topbar {
+      height: 52px; border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; padding: 0 16px; gap: 10px; flex-shrink: 0; z-index: 10;
     }
     .toggle-btn {
-      width:32px; height:32px; background:none; border:1px solid var(--border);
-      border-radius:8px; color:var(--muted); cursor:pointer;
-      display:flex; align-items:center; justify-content:center;
-      font-size:1rem; transition:all 0.14s; flex-shrink:0;
-      &:hover { background:var(--bg); color:var(--text); }
-    }
-    .g-spacer { flex:1; }
-    .theme-btn {
-      width:32px; height:32px; background:none; border:none;
-      border-radius:8px; color:var(--muted); cursor:pointer;
-      display:flex; align-items:center; justify-content:center;
-      font-size:0.88rem; transition:all 0.14s; flex-shrink:0;
-      &:hover { background:var(--emerald-dim); color:var(--emerald); }
+      border-radius: var(--r-sm); border: none;
+      background: transparent; color: var(--muted); cursor: pointer;
+      display: flex; align-items: center; justify-content: center; font-size: 1.2rem;
+      transition: all 0.14s ease;
+      &:hover { color: var(--text); background: var(--surface-2); }
     }
 
-    /* ── Notification ── */
-    .notif-wrap { position:relative; flex-shrink:0; }
+    .topbar-title { font-size: 1rem; font-weight: 700; color: var(--text); display: flex; align-items: center; gap: 8px; }
+    .topbar-chip { font-size: 0.72rem; font-weight: 700; color: var(--cobalt); background: var(--cobalt-dim); padding: 3px 8px; border-radius: 6px; }
+
+    .topbar-spacer { flex: 1; }
+
+    .lang-pill {
+      display: flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 14px;
+      background: var(--surface-2); border: 1px solid var(--border); cursor: pointer;
+      font-size: 0.75rem; font-weight: 700; color: var(--text);
+      transition: transform 0.15s ease, background-color 0.15s ease;
+      &:active { transform: scale(0.94); }
+      &:hover { background: var(--surface-hover); }
+    }
+    .lang-flag { font-size: 0.9rem; }
+    .lang-code { letter-spacing: 0.05em; font-family: var(--font-mono); }
+
+    /* Notif Bell */
+    .notif-wrap { position: relative; }
     .notif-btn {
-      width:32px; height:32px; background:none; border:none;
-      border-radius:8px; color:var(--muted); cursor:pointer;
-      display:flex; align-items:center; justify-content:center;
-      font-size:0.88rem; transition:all 0.14s; position:relative;
-      &:hover { background:var(--bg); color:var(--text); }
+      border-radius: var(--r-sm); border: none; position: relative;
+      background: transparent; color: var(--muted); cursor: pointer;
+      font-size: 1.15rem; transition: all 0.14s ease;
+      &:hover { color: var(--cobalt); background: var(--surface-2); }
     }
     .notif-dot {
-      position:absolute; top:4px; right:4px;
-      min-width:16px; height:16px; border-radius:8px;
-      background:#EF4444; border:1.5px solid var(--surface);
-      pointer-events:none;
-      font-size:0.55rem; font-weight:800; color:#fff;
-      display:flex; align-items:center; justify-content:center;
-      padding:0 3px;
+      position: absolute; top: 10px; right: 12px; width: 7px; height: 7px; border-radius: 50%;
+      background: var(--cobalt); border: 2px solid var(--surface);
     }
-    .notif-backdrop {
-      position:fixed; inset:0; z-index:98;
+    .notif-backdrop { position: fixed; inset: 0; z-index: 1010; }
+    .notif-popover {
+      position: absolute; top: calc(100% + 10px); right: -10px; width: 300px;
+      background: var(--surface); border: 1px solid var(--border-strong);
+      padding: 14px; border-radius: 16px; box-shadow: var(--shadow-lg); z-index: 1020;
+      animation: fadeUp 0.2s cubic-bezier(0.16, 1, 0.3, 1) both;
     }
-    .notif-panel {
-      position:absolute; top:calc(100% + 10px); right:0;
-      width:320px; z-index:99;
-      background:var(--surface); border:1px solid var(--border);
-      border-radius:16px; overflow:hidden;
-      box-shadow:0 8px 32px rgba(15,23,42,0.14), 0 2px 8px rgba(15,23,42,0.06);
-      animation:notifIn 0.18s cubic-bezier(0.4,0,0.2,1) both;
+    .notif-pop-hdr { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+    .notif-pop-title { font-size: 0.88rem; font-weight: 700; color: var(--text); }
+    .notif-pop-list { display: flex; flex-direction: column; gap: 8px; }
+    .notif-item { display: flex; gap: 10px; align-items: flex-start; padding: 6px 0; border-bottom: 1px solid var(--border); &:last-child { border: none; } }
+    .notif-ico-box {
+      width: 28px; height: 28px; border-radius: 50%; background: var(--green-dim); color: var(--green);
+      display: flex; align-items: center; justify-content: center; font-size: 0.9rem; flex-shrink: 0;
+      &.cobalt-ico { background: var(--cobalt-dim); color: var(--cobalt); }
     }
-    @keyframes notifIn {
-      from { opacity:0; transform:translateY(-6px) scale(0.97); }
-      to   { opacity:1; transform:none; }
-    }
-    .notif-hdr {
-      display:flex; align-items:center; justify-content:space-between;
-      padding:14px 18px 12px; border-bottom:1px solid var(--border);
-    }
-    .notif-hdr-title { font-size:0.9rem; font-weight:700; color:var(--text); }
-    .notif-hdr-actions { display:flex; align-items:center; gap:10px; }
-    .notif-clear {
-      font-size:0.72rem; font-weight:600; color:var(--red); cursor:pointer;
-      &:hover { opacity:0.7; }
-    }
-    .notif-empty {
-      padding:36px 20px; display:flex; flex-direction:column;
-      align-items:center; gap:8px; color:var(--subtle); text-align:center;
-      i { font-size:1.8rem; }
-      p { font-size:0.78rem; line-height:1.5; }
-    }
-    .notif-list {
-      max-height:360px; overflow-y:auto;
-    }
-    .notif-item {
-      display:flex; align-items:flex-start; gap:10px;
-      padding:12px 16px; border-bottom:1px solid var(--border);
-      transition:background 0.12s;
-      &:last-child { border-bottom:none; }
-      &.unread { background:rgba(45,212,191,0.04); }
-    }
-    .notif-icon {
-      font-size:1rem; flex-shrink:0; margin-top:1px;
-    }
-    .notif-success .notif-icon { color:#10B981; }
-    .notif-error   .notif-icon { color:#EF4444; }
-    .notif-info    .notif-icon { color:#3B82F6; }
-    .notif-body { display:flex; flex-direction:column; gap:3px; min-width:0; }
-    .notif-msg  { font-size:0.8rem; font-weight:500; color:var(--text); line-height:1.4; }
-    .notif-time { font-size:0.68rem; color:var(--subtle); }
+    .notif-item-content { display: flex; flex-direction: column; gap: 2px; }
+    .notif-item-title { font-size: 0.78rem; font-weight: 700; color: var(--text); }
+    .notif-item-desc { font-size: 0.7rem; color: var(--subtle); line-height: 1.3; }
 
-    .shell-main { flex:1; overflow-y:auto; overflow-x:hidden; background:var(--bg); }
-
-    /* ── Nav tooltip ── */
-    .nav-tip {
-      position:fixed; z-index:200;
-      transform:translateY(-50%);
-      background:#1E293B; color:#fff;
-      font-size:0.76rem; font-weight:600;
-      padding:5px 11px; border-radius:8px;
-      white-space:nowrap; pointer-events:none;
-      box-shadow:0 4px 16px rgba(0,0,0,0.18);
-      animation:tipIn 0.12s ease both;
-    }
-    @keyframes tipIn {
-      from { opacity:0; transform:translateY(-50%) translateX(-4px); }
-      to   { opacity:1; transform:translateY(-50%) translateX(0); }
+    .logout-top-btn {
+      background: none; border: none; color: var(--muted); cursor: pointer;
+      font-size: 1.15rem; border-radius: var(--r-sm);
+      display: flex; align-items: center; justify-content: center; transition: all 0.14s ease;
+      &:hover { color: var(--red); background: var(--red-dim); }
     }
 
-    /* Dark mode overrides */
-    body.dark .sidebar .nav-item.active {
-      background:transparent !important; color:var(--emerald) !important;
-      box-shadow:inset 2px 0 0 var(--emerald) !important;
-    }
-    body.dark .collapsed .sidebar .nav-item.active {
-      background:var(--emerald-dim) !important; box-shadow:none !important;
+    .shell-main { flex: 1; overflow-y: auto; background: var(--bg); position: relative; }
+
+    .mobile-backdrop { display: none; }
+    .mobile-bottom-bar { display: none; }
+
+    /* ── Mobile Layout (<768px) ── */
+    @media (max-width: 768px) {
+      .topbar { height: 48px; padding: 0 10px; gap: 6px; }
+      .topbar-title { font-size: 0.9rem; }
+      .logout-top-btn { display: none; }
+
+      .sidebar {
+        position: fixed; top: 0; bottom: 0; left: 0; width: 260px !important; z-index: 1050;
+        transform: translateX(-100%); box-shadow: var(--shadow-lg);
+      }
+      .sidebar.mobile-open { transform: translateX(0) !important; }
+      
+      .sidebar.collapsed .brand-meta,
+      .sidebar.collapsed .nav-label,
+      .sidebar.collapsed .user-info { display: flex !important; }
+      
+      .mobile-close-btn { display: flex; width: 44px; height: 44px; align-items: center; justify-content: center; }
+      .mobile-backdrop {
+        display: block; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.4);
+        backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 1040; animation: fadeIn 0.18s ease both;
+      }
+
+      .shell-main { padding-bottom: calc(76px + env(safe-area-inset-bottom, 0px)); }
+
+      .mobile-bottom-bar {
+        display: flex; position: fixed;
+        bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+        left: 12px; right: 12px; height: 58px;
+        border-radius: 26px;
+        z-index: 1020; justify-content: space-around; align-items: center; padding: 0 4px;
+        box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15), 0 2px 6px rgba(0,0,0,0.06);
+      }
+
+      .mbar-item {
+        flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+        color: var(--subtle); font-size: 0.65rem; font-weight: 500; text-decoration: none;
+        transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+        -webkit-tap-highlight-color: transparent;
+
+        .mbar-icon-wrap {
+          display: flex; align-items: center; justify-content: center;
+          width: 28px; height: 24px; border-radius: 12px;
+          transition: all 0.15s ease;
+          i { font-size: 1.25rem; }
+        }
+
+        &.active {
+          color: var(--cobalt); font-weight: 600;
+          .mbar-icon-wrap {
+            color: var(--cobalt);
+            transform: translateY(-1px);
+          }
+        }
+
+        &:active { transform: scale(0.92); }
+      }
+
+      .mbar-center {
+        flex: 0 0 52px;
+        .mbar-action-pill {
+          width: 44px; height: 44px; border-radius: 50%;
+          background: var(--cobalt);
+          color: #FFF;
+          display: flex; align-items: center; justify-content: center;
+          font-size: 1.3rem;
+          box-shadow: 0 4px 14px rgba(0, 122, 255, 0.4);
+          transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+        &:active .mbar-action-pill {
+          transform: scale(0.92);
+        }
+      }
     }
   `],
 })
 export class ShellComponent implements OnInit {
-  readonly auth       = inject(AuthStore);
-  readonly notifStore = inject(NotificationStore);
+  readonly auth = inject(AuthStore);
+  readonly i18n = inject(I18nService);
   private readonly router = inject(Router);
 
-  readonly collapsed   = signal(false);
-  readonly dark        = signal(false);
-  readonly notifOpen   = signal(false);
-  readonly tip         = signal<{ label: string; top: number; left: number } | null>(null);
-  private readonly url = signal('');
+  readonly collapsed = signal(false);
+  readonly mobileOpen = signal(false);
+  readonly showNotifs = signal(false);
 
   ngOnInit() {
     if (localStorage.getItem('sidebar-collapsed') === 'true') this.collapsed.set(true);
-    if (localStorage.getItem('dark-mode') === 'true') {
-      this.dark.set(true);
-      document.body.classList.add('dark');
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      this.applyTheme(true);
+    } else {
+      this.applyTheme(false);
     }
-    this.url.set(this.router.url);
-    this.router.events.subscribe(e => {
-      if (e instanceof NavigationEnd) this.url.set(e.urlAfterRedirects);
-    });
   }
 
-  isOnReports(): boolean {
-    return this.url().startsWith('/reports');
+  private applyTheme(isDark: boolean) {
+    if (isDark) {
+      document.documentElement.classList.add('dark');
+      document.body.classList.add('dark');
+      document.documentElement.classList.remove('light-theme');
+      document.body.classList.remove('light-theme');
+    } else {
+      document.documentElement.classList.remove('dark');
+      document.body.classList.remove('dark');
+      document.documentElement.classList.add('light-theme');
+      document.body.classList.add('light-theme');
+    }
   }
-
-  currentTab(): string {
-    const m = this.url().match(/[?&]tab=([^&]+)/);
-    return m ? m[1] : 'overview';
-  }
-
-  showTip(e: MouseEvent, label: string) {
-    if (!this.collapsed()) return;
-    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
-    this.tip.set({ label, top: rect.top + rect.height / 2, left: 66 });
-  }
-
-  hideTip() { this.tip.set(null); }
 
   toggleSidebar() {
-    this.tip.set(null);
-    this.collapsed.update(v => !v);
-    localStorage.setItem('sidebar-collapsed', String(this.collapsed()));
+    if (window.innerWidth <= 768) {
+      this.mobileOpen.update(v => !v);
+    } else {
+      this.collapsed.update(v => !v);
+      localStorage.setItem('sidebar-collapsed', String(this.collapsed()));
+    }
   }
 
-  toggleNotif() {
-    this.notifOpen.update(v => !v);
-    if (this.notifOpen()) this.notifStore.markAllRead();
+  closeMobileMenu() {
+    this.mobileOpen.set(false);
   }
 
-  relativeTime(date: Date): string {
-    const diff = Math.floor((Date.now() - date.getTime()) / 1000);
-    if (diff < 60) return 'Baru saja';
-    if (diff < 3600) return `${Math.floor(diff / 60)} menit lalu`;
-    if (diff < 86400) return `${Math.floor(diff / 3600)} jam lalu`;
-    return date.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' });
+  toggleLang() {
+    this.i18n.toggle();
   }
 
-  toggleDark() {
-    this.dark.update(v => !v);
-    document.body.classList.toggle('dark', this.dark());
-    localStorage.setItem('dark-mode', String(this.dark()));
+  toggleNotifPopover() {
+    this.showNotifs.update(v => !v);
   }
 
   logout() {

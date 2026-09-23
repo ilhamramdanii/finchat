@@ -4,7 +4,7 @@ export type TransactionType = 'EXPENSE' | 'INCOME';
 
 export type PaymentMethod = 'CASH' | 'TRANSFER' | 'QRIS';
 
-export type TransactionSource = 'WHATSAPP' | 'MANUAL' | 'IMPORT';
+export type TransactionSource = 'WHATSAPP' | 'MANUAL' | 'IMPORT' | 'VOICE';
 
 export interface Transaction {
   id: string;
@@ -29,6 +29,8 @@ export interface CreateTransactionDto {
   paymentMethod?: PaymentMethod;
   categoryId?: string;
   date?: string;
+  source?: TransactionSource;
+  rawMessage?: string;
 }
 
 export interface FilterTransactionDto {

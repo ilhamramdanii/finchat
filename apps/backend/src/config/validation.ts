@@ -12,6 +12,9 @@ export function validate(config: Record<string, unknown>) {
     FRONTEND_URL: Joi.string().default('http://localhost:4200'),
     WA_SESSION_PATH: Joi.string().default('./wa-sessions'),
     WA_OWNER_PHONE: Joi.string().allow('').default(''),
+    OTP_TTL_SEC: Joi.number().default(300),
+    OTP_MAX_PER_WINDOW: Joi.number().default(3),
+    OTP_WINDOW_SEC: Joi.number().default(900),
   }).unknown(true);
 
   const { error } = schema.validate(config);

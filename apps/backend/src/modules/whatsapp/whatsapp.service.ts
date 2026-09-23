@@ -30,6 +30,8 @@ export class WhatsappService implements OnModuleInit {
   private readonly sessionPath: string;
   private readonly ownerPhone: string;
   private readonly sentMessageIds = new Set<string>();
+  // Idempotency: pesan WA yang sudah di-enqueue (TTL 24 jam, cap 10k).
+  private readonly seenInboundIds = new Map<string, NodeJS.Timeout>();
 
   constructor(
     private readonly config: ConfigService,
@@ -43,6 +45,11 @@ export class WhatsappService implements OnModuleInit {
   }
 
   async onModuleInit() {
+    const isConfigured = this.ownerPhone && !this.ownerPhone.includes('x') && this.ownerPhone !== '628xxxxxxxxxx';
+    if (!isConfigured) {
+      this.logger.log('ℹ️ WA_OWNER_PHONE tidak diisi nomor valid. Bot WhatsApp dinonaktifkan (Mode Voice/Web Dashboard).');
+      return;
+    }
     await this.connect();
   }
 
@@ -107,6 +114,10 @@ export class WhatsappService implements OnModuleInit {
         // Skip pesan yang dikirim oleh bot sendiri
         if (this.sentMessageIds.has(msgId)) continue;
 
+        // Idempotency: drop duplikat reconnect / retry Baileys
+        if (this.seenInboundIds.has(msgId)) continue;
+        this.markInboundSeen(msgId);
+
         // Hanya proses pesan dari self-chat (kirim ke diri sendiri)
         const myJid = this.socket?.user?.id;
         const myLid = (this.socket?.user as any)?.lid;
@@ -136,6 +147,9 @@ export class WhatsappService implements OnModuleInit {
         await this.queue.add('process-message', incoming, {
           attempts: 3,
           backoff: { type: 'exponential', delay: 1000 },
+          jobId: msgId, // dedup di level Bull: jobId sama tidak dibuat ganda
+          removeOnComplete: true,
+          removeOnFail: false,
         });
       }
     });
@@ -165,5 +179,19 @@ export class WhatsappService implements OnModuleInit {
 
   isConnected(): boolean {
     return this.socket !== null;
+  }
+
+  private markInboundSeen(msgId: string) {
+    if (this.seenInboundIds.size >= 10_000) {
+      const oldest = this.seenInboundIds.keys().next().value;
+      if (oldest) {
+        clearTimeout(this.seenInboundIds.get(oldest));
+        this.seenInboundIds.delete(oldest);
+      }
+    }
+    const timer = setTimeout(() => this.seenInboundIds.delete(msgId), 24 * 3600 * 1000);
+    // Jangan tahan event-loop / proses hanya demi timer dedup
+    (timer as any)?.unref?.();
+    this.seenInboundIds.set(msgId, timer);
   }
 }

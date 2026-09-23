@@ -22,3 +22,8 @@ Thumbs.db
 # Angular
 apps/frontend/.angular/
 apps/frontend/dist/
+
+# Tool lokal — jangan di-commit
+.agents/
+.claude/
+skills-lock.json

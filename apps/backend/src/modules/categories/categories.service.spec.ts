@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { ConflictException } from '@nestjs/common';
+import { ConflictException, NotFoundException } from '@nestjs/common';
 import { CategoriesService } from './categories.service';
 import { PrismaService } from '../../prisma/prisma.service';
 
@@ -10,8 +10,10 @@ describe('CategoriesService', () => {
       findMany: jest.Mock;
       findUnique: jest.Mock;
       create: jest.Mock;
+      update: jest.Mock;
       delete: jest.Mock;
     };
+    $transaction: jest.Mock;
   };
 
   beforeEach(async () => {
@@ -20,8 +22,10 @@ describe('CategoriesService', () => {
         findMany: jest.fn(),
         findUnique: jest.fn(),
         create: jest.fn(),
+        update: jest.fn(),
         delete: jest.fn(),
       },
+      $transaction: jest.fn(),
     };
 
     const module: TestingModule = await Test.createTestingModule({
@@ -75,6 +79,40 @@ describe('CategoriesService', () => {
         service.create({ name: 'Makan', type: 'EXPENSE' as const }),
       ).rejects.toBeInstanceOf(ConflictException);
       expect(prisma.category.create).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('update', () => {
+    it('updates category keywords and properties', async () => {
+      prisma.category.findUnique
+        .mockResolvedValueOnce({ id: 'c1', name: 'Makan' });
+      prisma.category.update.mockResolvedValue({ id: 'c1', name: 'Makan', keywords: ['kopi', 'nasi'] });
+
+      const res = await service.update('c1', { keywords: ['kopi', 'nasi'] });
+      expect(prisma.category.update).toHaveBeenCalledWith({
+        where: { id: 'c1' },
+        data: { keywords: ['kopi', 'nasi'] },
+      });
+      expect(res.keywords).toEqual(['kopi', 'nasi']);
+    });
+
+    it('throws NotFoundException if category not found', async () => {
+      prisma.category.findUnique.mockResolvedValue(null);
+      await expect(service.update('invalid', { keywords: [] })).rejects.toBeInstanceOf(NotFoundException);
+    });
+  });
+
+  describe('bulkUpdateKeywords', () => {
+    it('executes batch transactions for multiple categories', async () => {
+      prisma.$transaction.mockResolvedValue([{ id: 'c1' }, { id: 'c2' }]);
+      const res = await service.bulkUpdateKeywords({
+        updates: [
+          { id: 'c1', keywords: ['makan', 'minum'] },
+          { id: 'c2', keywords: ['bensin', 'tol'] },
+        ],
+      });
+      expect(prisma.$transaction).toHaveBeenCalled();
+      expect(res.length).toBe(2);
     });
   });
 

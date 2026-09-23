@@ -1,38 +1,138 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,400;0,500;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 @import 'bootstrap-icons/font/bootstrap-icons.css';
 
 :root {
-  --bg:           #F0F2F5;
-  --surface:      #FFFFFF;
-  --navy:         #0F172A;
-  --navy-2:       #1E293B;
-  --navy-3:       #334155;
+  /* ── APPLE HIG SEMANTIC COLORS (LIGHT MODE) ── */
+  --bg:                     #F2F2F7; /* iOS systemGroupedBackground */
+  --surface:                #FFFFFF; /* iOS secondarySystemGroupedBackground */
+  --surface-2:              #E5E5EA; /* iOS systemGray5 */
+  --surface-hover:          #D1D1D6; /* iOS systemGray4 */
+  --surface-translucent:    rgba(255, 255, 255, 0.82);
+  
+  /* System Accents */
+  --cobalt:                 #007AFF; /* iOS systemBlue */
+  --cobalt-bright:          #0062CC;
+  --cobalt-dim:             rgba(0, 122, 255, 0.12);
+  
+  --amber:                  #FF9500; /* iOS systemOrange */
+  --amber-bright:           #D97706;
+  --amber-dim:              rgba(255, 149, 0, 0.12);
+  
+  --green:                  #34C759; /* iOS systemGreen */
+  --green-bright:           #28A745;
+  --green-dim:              rgba(52, 199, 89, 0.12);
+  
+  --red:                    #FF3B30; /* iOS systemRed */
+  --red-bright:             #D32F2F;
+  --red-dim:                rgba(255, 59, 48, 0.12);
 
-  /* ── Mint accent (replaces emerald) ── */
-  --emerald:      #2DD4BF;
-  --emerald-dark: #0D9488;
-  --emerald-dim:  rgba(45, 212, 191, 0.12);
+  /* Apple System Typography */
+  --text:                   #000000; /* iOS label */
+  --muted:                  #3C3C43; /* iOS secondaryLabel (60% alpha feel) */
+  --subtle:                 #8E8E93; /* iOS tertiaryLabel */
+  
+  /* System Separators */
+  --border:                 rgba(60, 60, 67, 0.12); /* iOS separator */
+  --border-strong:          rgba(60, 60, 67, 0.22);
+  --border-active:          #007AFF;
+  
+  --shadow-sm:              0 1px 3px rgba(0, 0, 0, 0.05);
+  --shadow-md:              0 4px 14px rgba(0, 0, 0, 0.08);
+  --shadow-lg:              0 12px 32px rgba(0, 0, 0, 0.12);
 
-  --red:          #EF4444;
-  --red-dim:      rgba(239, 68, 68, 0.09);
-  --blue:         #3B82F6;
-  --blue-dim:     rgba(59, 130, 246, 0.09);
-  --amber:        #D97706;
-  --amber-dim:    rgba(217, 119, 6, 0.09);
+  /* Corner Radii (Apple Continuous Curves) */
+  --r:                      14px;
+  --r-lg:                   20px;
+  --r-sm:                   10px;
+  --r-xs:                   6px;
 
-  --text:         #0F172A;
-  --muted:        #64748B;
-  --subtle:       #94A3B8;
-  --border:       rgba(226, 232, 240, 0.8);
-  --border-solid: #E2E8F0;
-  --shadow:       0 1px 4px rgba(15,23,42,0.04), 0 4px 16px rgba(15,23,42,0.04);
-  --shadow-md:    0 4px 20px rgba(15,23,42,0.08);
-  --shadow-lg:    0 10px 40px rgba(15,23,42,0.10), 0 2px 8px rgba(15,23,42,0.05);
-  --r:            12px;
-  --r-sm:         8px;
-  --r-xs:         5px;
-  --font:         'Plus Jakarta Sans', system-ui, sans-serif;
-  --font-mono:    'DM Mono', 'JetBrains Mono', ui-monospace, monospace;
+  /* Font Stack - Apple Clean Sans for numbers (No Slashed Zero) */
+  --font:                   -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Plus Jakarta Sans", Helvetica, Arial, sans-serif;
+  --font-display:           -apple-system, BlinkMacSystemFont, "SF Pro Display", "Plus Jakarta Sans", Helvetica, Arial, sans-serif;
+  --font-mono:              -apple-system, BlinkMacSystemFont, "SF Pro Text", "Plus Jakarta Sans", sans-serif;
+
+  /* Safe Area Variables */
+  --sat:                    env(safe-area-inset-top, 0px);
+  --sab:                    env(safe-area-inset-bottom, 0px);
+  --sal:                    env(safe-area-inset-left, 0px);
+  --sar:                    env(safe-area-inset-right, 0px);
+}
+
+/* ── APPLE HIG SEMANTIC COLORS (DARK MODE) ── */
+:root.dark,
+body.dark,
+html.dark {
+  --bg:                     #000000;
+  --surface:                #1C1C1E;
+  --surface-2:              #2C2C2E;
+  --surface-hover:          #3A3A3C;
+  --surface-translucent:    rgba(28, 28, 30, 0.85);
+  
+  --cobalt:                 #0A84FF;
+  --cobalt-bright:          #409CFF;
+  --cobalt-dim:             rgba(10, 132, 255, 0.18);
+  
+  --amber:                  #FF9F0A;
+  --amber-bright:           #FFB340;
+  --amber-dim:              rgba(255, 159, 10, 0.18);
+  
+  --green:                  #30D158;
+  --green-bright:           #5CE07A;
+  --green-dim:              rgba(48, 209, 88, 0.18);
+  
+  --red:                    #FF453A;
+  --red-bright:             #FF6961;
+  --red-dim:              rgba(255, 69, 58, 0.18);
+
+  --text:                 #FFFFFF;
+  --muted:                #EBEBF5;
+  --subtle:               #8E8E93;
+  
+  --border:               rgba(255, 255, 255, 0.12);
+  --border-strong:        rgba(255, 255, 255, 0.22);
+  --border-active:        #0A84FF;
+  
+  --shadow-sm:            0 1px 3px rgba(0, 0, 0, 0.35);
+  --shadow-md:            0 6px 18px rgba(0, 0, 0, 0.5);
+  --shadow-lg:            0 16px 40px rgba(0, 0, 0, 0.7);
+}
+
+@media (prefers-color-scheme: dark) {
+  body:not(.light-theme) {
+    --bg:                   #000000;
+    --surface:              #1C1C1E;
+    --surface-2:            #2C2C2E;
+    --surface-hover:        #3A3A3C;
+    --surface-translucent:  rgba(28, 28, 30, 0.85);
+    
+    --cobalt:               #0A84FF;
+    --cobalt-bright:        #409CFF;
+    --cobalt-dim:           rgba(10, 132, 255, 0.18);
+    
+    --amber:                #FF9F0A;
+    --amber-bright:         #FFB340;
+    --amber-dim:            rgba(255, 159, 10, 0.18);
+    
+    --green:                #30D158;
+    --green-bright:         #5CE07A;
+    --green-dim:            rgba(48, 209, 88, 0.18);
+    
+    --red:                  #FF453A;
+    --red-bright:           #FF6961;
+    --red-dim:              rgba(255, 69, 58, 0.18);
+
+    --text:                 #FFFFFF;
+    --muted:                #EBEBF5;
+    --subtle:               #8E8E93;
+    
+    --border:               rgba(255, 255, 255, 0.12);
+    --border-strong:        rgba(255, 255, 255, 0.22);
+    --border-active:        #0A84FF;
+    
+    --shadow-sm:            0 1px 3px rgba(0, 0, 0, 0.35);
+    --shadow-md:            0 6px 18px rgba(0, 0, 0, 0.5);
+    --shadow-lg:            0 16px 40px rgba(0, 0, 0, 0.7);
+  }
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -44,200 +144,158 @@ html, body {
   color: var(--text);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+/* Subtle background grid pattern */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: linear-gradient(to right, rgba(128, 128, 128, 0.05) 1px, transparent 1px),
+                    linear-gradient(to bottom, rgba(128, 128, 128, 0.05) 1px, transparent 1px);
+  background-size: 32px 32px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+body.dark::before {
+  background-image: linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                    linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
 }
 
 a { text-decoration: none; color: inherit; }
 
-/* ── Mono utility — apply to all currency / numeric values ── */
-.num {
-  font-family: var(--font-mono);
-  letter-spacing: -0.02em;
-  font-feature-settings: "tnum";
+.font-display {
+  font-family: var(--font-display);
+  font-weight: 800;
+  letter-spacing: -0.03em;
 }
 
-/* ── Shared utilities ──────────────────────────── */
-.income-color  { color: var(--emerald) !important; }
-.expense-color { color: var(--red)     !important; }
+.num {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  font-feature-settings: "tnum" 1, "zero" 0;
+}
+
+/* ── Minimal Clean Badges (Apple Pill Style) ── */
+.income-color  { color: var(--green) !important; }
+.expense-color { color: var(--red) !important; }
+.cobalt-color  { color: var(--cobalt) !important; }
+
+/* ── Apple HIG Inset Grouped Card ── */
+.apple-card {
+  background: var(--surface);
+  border-radius: var(--r);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+
+/* ── Apple Liquid Glass Effect (iOS 26 Style Blur & Translucency) ── */
+.liquid-glass {
+  background: var(--surface-translucent);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid var(--border-strong);
+}
+
+/* ── Apple Touch Target Utility (Minimum 44x44pt) ── */
+.tap-target-44 {
+  min-width: 44px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ── Apple Segmented Control ── */
+.segmented-control {
+  display: inline-flex;
+  background: var(--surface-2);
+  padding: 3px;
+  border-radius: 9px;
+  border: 1px solid var(--border);
+  gap: 2px;
+}
+
+.segmented-item {
+  border: none;
+  background: transparent;
+  padding: 5px 14px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  border-radius: 7px;
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.16s ease;
+  min-height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &.active {
+    background: var(--surface);
+    color: var(--text);
+    font-weight: 700;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+  }
+}
+
+/* Mobile scale adjustments */
+@media (max-width: 640px) {
+  :root {
+    --r: 12px;
+    --r-lg: 16px;
+    --r-sm: 8px;
+    --r-xs: 4px;
+  }
+}
 
 .badge {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  padding: 4px 10px;
-  border-radius: 9999px;
-  font-size: 0.68rem;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  white-space: nowrap;
-  font-family: var(--font-mono);
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  font-family: var(--font);
+  border: none;
 
-  &.income   { background: var(--emerald-dim); color: var(--emerald-dark); }
-  &.expense  { background: var(--red-dim);     color: var(--red);          }
-  &.cash     { background: #F1F5F9;            color: #475569;             }
-  &.transfer { background: var(--blue-dim);    color: var(--blue);         }
-  &.qris     { background: var(--amber-dim);   color: var(--amber);        }
+  &.income   { background: var(--green-dim); color: var(--green); }
+  &.expense  { background: var(--red-dim);   color: var(--red);   }
+  &.cash     { background: var(--surface-2); color: var(--muted); }
+  &.transfer { background: var(--cobalt-dim); color: var(--cobalt); }
+  &.qris     { background: var(--amber-dim);  color: var(--amber);  }
 }
 
-/* ── Material overrides ────────────────────────── */
+/* ── Material & Custom Card Styles ── */
 mat-card, .mat-mdc-card {
   border-radius: var(--r) !important;
-  box-shadow: var(--shadow) !important;
-  border: 1px solid rgba(226, 232, 240, 0.7) !important;
+  box-shadow: var(--shadow-sm) !important;
+  border: 1px solid var(--border) !important;
   background: var(--surface) !important;
 }
 
 .mat-mdc-progress-bar {
-  --mdc-linear-progress-active-indicator-color: var(--emerald);
-  --mdc-linear-progress-track-color: var(--emerald-dim);
-  border-radius: 4px;
+  --mdc-linear-progress-active-indicator-color: var(--cobalt);
+  --mdc-linear-progress-track-color: var(--cobalt-dim);
+  border-radius: 2px;
 }
 
-/* Compact form fields */
-.mat-mdc-form-field {
-  --mat-form-field-container-height: 40px;
-  --mat-form-field-filled-label-display: none;
-  --mdc-outlined-text-field-label-text-size: 0.8rem;
-}
-.mat-mdc-form-field .mat-mdc-form-field-subscript-wrapper { display: none; }
-.mat-mdc-text-field-wrapper { padding: 0 10px !important; }
-.mat-mdc-form-field-infix { padding-top: 10px !important; padding-bottom: 10px !important; min-height: 40px !important; }
-.mdc-text-field--outlined .mdc-notched-outline { height: 40px !important; }
-.mat-mdc-select-value, .mat-mdc-input-element { font-size: 0.85rem !important; }
-
-/* Form field borders */
-.mdc-text-field--outlined:not(.mdc-text-field--disabled) .mdc-notched-outline__leading,
-.mdc-text-field--outlined:not(.mdc-text-field--disabled) .mdc-notched-outline__notch,
-.mdc-text-field--outlined:not(.mdc-text-field--disabled) .mdc-notched-outline__trailing {
-  border-color: var(--border) !important;
-}
-.mdc-text-field--outlined .mdc-notched-outline__leading { border-radius: var(--r-sm) 0 0 var(--r-sm) !important; }
-.mdc-text-field--outlined .mdc-notched-outline__trailing { border-radius: 0 var(--r-sm) var(--r-sm) 0 !important; }
-
-/* Mat flat button – primary */
-.mat-mdc-unelevated-button.mat-primary {
-  --mdc-filled-button-container-color: var(--emerald) !important;
-  --mdc-filled-button-label-text-color: #fff !important;
+.mat-mdc-snack-bar-container {
   border-radius: var(--r-sm) !important;
-}
-
-/* Paginator — compact */
-.mat-mdc-paginator {
-  background: transparent !important;
-  --mat-paginator-container-size: 40px;
-  font-size: 0.8rem !important;
-}
-
-/* Snackbar */
-.mat-mdc-snack-bar-container { border-radius: var(--r-sm) !important; }
-
-/* ── Dark mode ─────────────────────────── */
-body.dark {
-  --bg:           #0D0F12;
-  --surface:      #111318;
-  --surface-2:    #181B21;
-  --navy:         #0D0F12;
-  --navy-2:       #111318;
-  --navy-3:       #181B21;
-  --text:         #E8EAED;
-  --muted:        #8B949E;
-  --subtle:       #6E7681;
-  --border:       rgba(240,246,252,0.07);
-  --border-solid: rgba(240,246,252,0.10);
-  --shadow:       0 1px 4px rgba(0,0,0,0.4), 0 4px 16px rgba(0,0,0,0.4);
-  --shadow-md:    0 4px 20px rgba(0,0,0,0.55);
-  --shadow-lg:    0 10px 40px rgba(0,0,0,0.7);
-  --emerald-dim:  rgba(45,212,191,0.14);
-  --red-dim:      rgba(239,68,68,0.13);
-  --blue-dim:     rgba(59,130,246,0.13);
-  --amber-dim:    rgba(217,119,6,0.13);
-}
-
-body.dark mat-card,
-body.dark .mat-mdc-card {
-  background: var(--surface) !important;
-  border-color: var(--border) !important;
-}
-
-/* ── Dark mode: Angular Material table ─── */
-body.dark .mat-mdc-table,
-body.dark .mdc-data-table__table { background: var(--surface) !important; }
-body.dark .mat-mdc-header-row,
-body.dark .mdc-data-table__header-row { background: var(--bg) !important; }
-body.dark .mat-mdc-row,
-body.dark .mdc-data-table__row,
-body.dark .mdc-data-table__content { background: var(--surface) !important; }
-body.dark .mat-mdc-row:hover,
-body.dark .mdc-data-table__row:hover { background: var(--bg) !important; }
-body.dark td.mat-mdc-cell,
-body.dark th.mat-mdc-header-cell { color: var(--text) !important; border-color: var(--border) !important; }
-body.dark th.mat-mdc-header-cell { color: var(--muted) !important; }
-
-/* ── Dark mode: Paginator ─────────────── */
-body.dark .mat-mdc-paginator { background: var(--surface) !important; color: var(--text) !important; }
-body.dark .mat-mdc-paginator-range-label,
-body.dark .mat-mdc-paginator-page-size-label,
-body.dark .mat-mdc-select-value,
-body.dark .mat-mdc-paginator .mat-mdc-icon-button { color: var(--text) !important; }
-body.dark .mat-mdc-paginator .mat-mdc-icon-button:disabled { color: var(--muted) !important; }
-
-/* ── Dark mode: Form fields ───────────── */
-body.dark .mat-mdc-input-element,
-body.dark .mat-mdc-select-value,
-body.dark .mat-mdc-select-arrow { color: var(--text) !important; }
-body.dark .mat-mdc-form-field-label,
-body.dark .mat-label { color: var(--muted) !important; }
-body.dark .mdc-text-field--outlined:not(.mdc-text-field--disabled) .mdc-notched-outline__leading,
-body.dark .mdc-text-field--outlined:not(.mdc-text-field--disabled) .mdc-notched-outline__notch,
-body.dark .mdc-text-field--outlined:not(.mdc-text-field--disabled) .mdc-notched-outline__trailing {
-  border-color: var(--border) !important;
-}
-body.dark .mdc-text-field--outlined:not(.mdc-text-field--disabled) {
-  background: rgba(255,255,255,0.04) !important;
-}
-
-/* ── Dark mode: Select panel ── */
-body.dark .mat-mdc-select-panel,
-body.dark .mdc-menu-surface { background: #181B21 !important; border: 1px solid var(--border) !important; }
-body.dark .mat-mdc-option { color: var(--text) !important; }
-body.dark .mat-mdc-option:hover,
-body.dark .mat-mdc-option.mdc-list-item--selected { background: var(--bg) !important; }
-
-/* ── Dark mode: Buttons ───────────────── */
-body.dark .mat-mdc-icon-button { color: var(--muted) !important; }
-body.dark .mat-mdc-icon-button:hover { background: rgba(255,255,255,0.06) !important; }
-
-/* ── Dark mode: Snackbar ──────────────── */
-body.dark .mat-mdc-snack-bar-container { background: #181B21 !important; color: var(--text) !important; }
-
-/* ── Dark mode: Custom buttons ────────── */
-body.dark .btn-primary,
-body.dark .btn-save { background: var(--emerald) !important; color: #0D0F12 !important; }
-body.dark .btn-primary:hover:not(:disabled),
-body.dark .btn-save:hover:not(:disabled) { background: var(--emerald-dark) !important; opacity: 1 !important; }
-body.dark .btn-ghost,
-body.dark .btn-sec { background: rgba(255,255,255,0.07) !important; color: var(--text) !important; border-color: var(--border) !important; }
-body.dark .btn-ghost:hover,
-body.dark .btn-sec:hover { background: rgba(255,255,255,0.12) !important; }
-body.dark .btn-outline { border-color: var(--emerald) !important; color: var(--emerald) !important; background: transparent !important; }
-body.dark .btn-outline:hover { background: var(--emerald-dim) !important; }
-
-/* ── Dark mode: Nav active (left bar indicator) ── */
-body.dark .sidebar .nav-item.active {
-  background: transparent !important;
-  color: var(--emerald) !important;
-  box-shadow: inset 2px 0 0 var(--emerald) !important;
-}
-
-/* ── Native inputs dark mode ── */
-body.dark .mf-input,
-body.dark .mf-select {
-  background: rgba(255,255,255,0.05) !important;
-  border-color: var(--border) !important;
+  background: var(--surface-translucent) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border: 1px solid var(--border-strong) !important;
   color: var(--text) !important;
 }
 
-/* ── Global animations ──────────────────── */
+/* Keyframe Animations */
 @keyframes fadeUp {
   from { opacity: 0; transform: translateY(10px); }
   to   { opacity: 1; transform: translateY(0); }
@@ -246,64 +304,56 @@ body.dark .mf-select {
   from { opacity: 0; }
   to   { opacity: 1; }
 }
-@keyframes scaleIn {
-  from { opacity: 0; transform: scale(0.93); }
-  to   { opacity: 1; transform: scale(1); }
+
+.page-fade { animation: fadeUp 0.22s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.fade-in   { animation: fadeIn 0.18s ease both; }
+/* ── Professional Skeleton & Linear Shimmer ── */
+.skeleton {
+  background: linear-gradient(90deg, var(--surface-2) 25%, var(--border-strong) 50%, var(--surface-2) 75%);
+  background-size: 800px 100%;
+  animation: shimmer 1.5s infinite linear;
+  border-radius: var(--r-xs);
+  display: block;
 }
-@keyframes barGrow {
-  from { transform: scaleY(0); transform-origin: bottom; opacity: 0; }
-  to   { transform: scaleY(1); transform-origin: bottom; opacity: 1; }
-}
-@keyframes ringFill {
-  from { stroke-dasharray: 0 999; }
-}
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to   { transform: rotate(360deg); }
-}
+
 @keyframes shimmer {
   0%   { background-position: -800px 0; }
   100% { background-position: 800px 0; }
 }
 
-/* Utilities */
-.page-fade  { animation: fadeUp  0.28s cubic-bezier(0.4, 0, 0.2, 1) both; }
-.fade-in-up { animation: fadeUp  0.22s ease both; }
-.fade-in    { animation: fadeIn  0.2s ease both; }
-.scale-in   { animation: scaleIn 0.22s ease both; }
-.spin       { animation: spin 0.8s linear infinite; display: inline-block; }
+/* ── Apple Smooth Chart Motion & Hover Transitions ── */
+.cf-svg, .daily-svg {
+  overflow: visible;
+  
+  path {
+    stroke-dasharray: 1000;
+    stroke-dashoffset: 1000;
+    animation: chartDraw 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
 
-/* Staggered children */
-.stagger > *:nth-child(1) { animation-delay: 0.04s; }
-.stagger > *:nth-child(2) { animation-delay: 0.08s; }
-.stagger > *:nth-child(3) { animation-delay: 0.12s; }
-.stagger > *:nth-child(4) { animation-delay: 0.16s; }
-.stagger > *:nth-child(5) { animation-delay: 0.20s; }
-.stagger > *:nth-child(6) { animation-delay: 0.24s; }
-.stagger > *:nth-child(7) { animation-delay: 0.28s; }
-.stagger > *:nth-child(8) { animation-delay: 0.32s; }
+  rect {
+    transform-origin: bottom;
+    animation: barGrow 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+    transition: opacity 0.2s ease, transform 0.2s ease;
 
-/* Card hover */
-.card-hover {
-  transition: box-shadow 0.2s ease, transform 0.2s ease;
-  &:hover { box-shadow: 0 8px 28px rgba(15,23,42,0.11) !important; transform: translateY(-2px); }
+    &:hover {
+      opacity: 1 !important;
+      filter: drop-shadow(0 2px 6px rgba(0, 122, 255, 0.35));
+    }
+  }
 }
-body.dark .card-hover:hover { box-shadow: 0 8px 28px rgba(0,0,0,0.5) !important; }
 
-/* Button micro-interactions */
-.btn-primary, .btn-save, .btn-exp, .btn-exp-sm, .btn-ghost, .btn-sec, .btn-outline { transition: all 0.15s ease; }
-.btn-primary:active:not(:disabled),
-.btn-save:active:not(:disabled) { transform: scale(0.97); }
-.btn-exp:active, .btn-exp-sm:active { transform: scale(0.96); }
-
-/* Skeleton loader */
-.skeleton {
-  background: linear-gradient(90deg, var(--border) 25%, rgba(226,232,240,0.5) 50%, var(--border) 75%);
-  background-size: 800px 100%;
-  animation: shimmer 1.4s infinite;
-  border-radius: 4px;
+@keyframes chartDraw {
+  to { stroke-dashoffset: 0; }
 }
-body.dark .skeleton {
-  background: linear-gradient(90deg, rgba(255,255,255,0.05) 25%, rgba(255,255,255,0.1) 50%, rgba(255,255,255,0.05) 75%);
-  background-size: 800px 100%;
+
+@keyframes barGrow {
+  from {
+    opacity: 0;
+    transform: scaleY(0);
+  }
+  to {
+    opacity: 1;
+    transform: scaleY(1);
+  }
 }

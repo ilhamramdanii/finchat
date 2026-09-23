@@ -18,3 +18,18 @@ export interface CreateCategoryDto {
   icon?: string;
   color?: string;
 }
+
+export interface UpdateCategoryDto {
+  name?: string;
+  type?: CategoryType;
+  keywords?: string[];
+  icon?: string;
+  color?: string;
+}
+
+export interface BulkUpdateKeywordsDto {
+  updates: {
+    id: string;
+    keywords: string[];
+  }[];
+}

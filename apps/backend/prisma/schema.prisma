@@ -26,12 +26,18 @@ enum TransactionSource {
   WHATSAPP
   MANUAL
   IMPORT
+  VOICE
 }
 
 enum CategoryType {
   EXPENSE
   INCOME
   BOTH
+}
+
+enum TransactionStatus {
+  ACTIVE
+  VOIDED
 }
 
 // ========================
@@ -69,12 +75,15 @@ model Transaction {
   type          TransactionType   @default(EXPENSE)
   paymentMethod PaymentMethod     @default(CASH)
   source        TransactionSource @default(WHATSAPP)
+  status        TransactionStatus @default(ACTIVE)
+  messageId     String?           @unique
   rawMessage    String
   description   String
   amount        Float
   date          DateTime          @default(now())
   createdAt     DateTime          @default(now())
   updatedAt     DateTime          @updatedAt
+  voidedAt      DateTime?
 
   user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   category Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)

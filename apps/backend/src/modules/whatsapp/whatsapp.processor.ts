@@ -20,7 +20,7 @@ export class WhatsappProcessor {
 
   @Process('process-message')
   async handle(job: Job<IncomingMessage>) {
-    const { from, text, pushName } = job.data;
+    const { from, text, pushName, messageId } = job.data;
     this.logger.debug(`📨 Pesan dari ${from}: "${text}"`);
 
     const result = this.parser.parse(text);
@@ -52,6 +52,7 @@ export class WhatsappProcessor {
         categoryId: category?.id,
         rawMessage: t.rawMessage,
         source: 'WHATSAPP',
+        messageId,
       });
 
       const emoji = t.type === 'INCOME' ? '✅ *Pemasukan*' : '✅ *Pengeluaran*';
@@ -91,6 +92,17 @@ export class WhatsappProcessor {
 
     if (command === 'HELP') {
       await this.wa.sendMessage(from, WA_HELP_MESSAGE);
+      return;
+    }
+
+    if (command === 'CANCEL') {
+      const voided = await this.transactions.voidLast(user.id, 60);
+      await this.wa.sendMessage(
+        from,
+        voided
+          ? `🗑️ Transaksi terakhir dibatalkan:\n📝 ${voided.description}\n💰 Rp ${voided.amount.toLocaleString('id-ID')}`
+          : '⚠️ Tidak ada transaksi aktif dalam 60 menit terakhir untuk dibatalkan.',
+      );
       return;
     }
 
