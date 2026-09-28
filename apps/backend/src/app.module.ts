@@ -22,12 +22,20 @@ import { VoiceModule } from './modules/voice/voice.module';
     }),
     BullModule.forRootAsync({
       inject: [ConfigService],
-      useFactory: (config: ConfigService) => ({
-        redis: {
-          host: config.get('redis.host'),
-          port: config.get('redis.port'),
-        },
-      }),
+      useFactory: (config: ConfigService) => {
+        const password = config.get<string>('redis.password');
+        const tlsEnabled = config.get<boolean>('redis.tlsEnabled');
+        return {
+          redis: {
+            host: config.get('redis.host'),
+            port: config.get('redis.port'),
+            ...(password ? { username: config.get('redis.username'), password } : {}),
+            ...(tlsEnabled ? { tls: {} } : {}),
+            enableReadyCheck: false,
+            maxRetriesPerRequest: null,
+          },
+        };
+      },
     }),
     ScheduleModule.forRoot(),
     PrismaModule,

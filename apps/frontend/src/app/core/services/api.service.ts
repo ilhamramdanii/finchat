@@ -12,7 +12,10 @@ export interface ApiResponse<T> {
 @Injectable({ providedIn: 'root' })
 export class ApiService {
   private readonly http = inject(HttpClient);
-  private readonly baseUrl = 'http://localhost:3000/api';
+  private readonly baseUrl =
+    (typeof window !== 'undefined' &&
+      (window as unknown as { __FINCHAT_API_URL?: string }).__FINCHAT_API_URL) ||
+    'http://localhost:3000/api';
 
   get<T>(path: string, params?: Record<string, any>): Observable<T> {
     let httpParams = new HttpParams();
